@@ -1,0 +1,76 @@
+---
+title: "Iris_Dataset_KMeans"
+author: "Kushal Regmi"
+date: "04/15/2021"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(factoextra)
+```
+
+```{r}
+data(iris)
+labels <- iris$Species
+table(labels)
+```
+
+
+## Remove labels for unsupervised clustering
+
+```{r}
+iris_data <- iris %>%
+  select(-Species)
+
+```
+
+
+## scale dataset preperation
+
+```{r}
+iris_scaled <- scale(iris_data)
+```
+
+```{r}
+iris_data <- dist(iris_scaled)
+iris_data %>% 
+  head(5)
+```
+
+
+
+## Determine number of clusters using withing sum square method
+
+
+```{r}
+fviz_nbclust(iris_scaled, kmeans, method = "wss") + 
+  labs(subtitle = "Elbow method")
+```
+
+
+```{r}
+km_output <- kmeans(iris_scaled, centers = 3, nstart = 100)
+
+km_output
+```
+
+
+## Cluster Visualization
+
+```{r}
+km_cluster <- km_output$cluster
+
+rownames(iris_scaled) <- paste(iris$Species, 1:dim(iris)[1])
+
+fviz_cluster(list(data = iris_scaled, cluster = km_cluster))
+```
+
+## Results
+
+
+```{r}
+table(km_cluster, iris$Species)
+```
+
+
